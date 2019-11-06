@@ -1,6 +1,7 @@
 import serial
 import time
 import threading
+import datetime
 
 es920lr = None
 
@@ -57,7 +58,12 @@ def test01TH(ser):
                     a4 = a3[1].split('):PAN')
                     rssi = a4[0]
                     data = a2[0]
-                    print(rssi, ' ', rxPanID, ' ', srcid, ' ', dstid, ' ', length, ' ', data.hex())
+                    log = str(datetime.datetime.now()) + '\t' + rssi + ' ' + rxPanID + ' ' + srcid + ' ' + dstid + ' ' + length + ' ' + data.hex() + '\r'
+                    print(datetime.datetime.now(), '\t', rssi, ' ', rxPanID, ' ', srcid, ' ', dstid, ' ', length, ' ', data.hex())
+
+                    f = open('log.txt', 'a')
+                    f.writelines(str(log))
+                    f.close()
 
 def test02TH(ser):
     global loraRxData
@@ -103,12 +109,13 @@ def test02TH(ser):
             loraInitFalg = False
             print('init Done...')
 
+
 if __name__ == "__main__":
 
     deviceInfo.append(input("please set channel (1 - 5) > "))
     deviceInfo.append(input("please set PAN ID (0001 - FFFE) > "))
     deviceInfo.append(input("please set Own Node ID (000000 - FFFFFE) > "))
-    deviceInfo.append(input("please set COM Port (COM1 - xx) > "))
+    deviceInfo.append(input("please set COM Port (COM1 - COMxx) > "))
     es920lr = serial.Serial(deviceInfo[3], 115200)
     threading.Thread(target=test01TH, args=(es920lr,)).start()
     threading.Thread(target=test02TH, args=(es920lr,)).start()
